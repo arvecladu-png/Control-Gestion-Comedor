@@ -302,13 +302,22 @@ export interface MenuImportRow {
 
 
 // DAILY CLOSING TYPES
+export interface ExecutedIngredient {
+  inventoryItemId: string;
+  name: string;
+  executedQuantity: number; // total quantity used for the day
+  unit: string;
+}
+
 export interface DailyClosingItem {
   name: string;
   category: MenuItemCategory;
+  ingredients?: ExecutedIngredient[];
 }
 
 export interface DailyClosing {
-  closingId: string;
+  id?: string;
+  closingId?: string;
   comedorId: string;
   date: Timestamp | Date;
   plannedMenuId: string | null;
@@ -316,6 +325,8 @@ export interface DailyClosing {
   executedItems: DailyClosingItem[];
   variations: string;
   closedBy: string; // userId
+  lastServiceTime?: string;
+  incidencesCount?: number;
 }
 
 // ATTENDANCE TYPES

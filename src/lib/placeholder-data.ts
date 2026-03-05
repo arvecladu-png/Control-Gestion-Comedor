@@ -571,8 +571,9 @@ export const dailyMenu: Menu = {
 export const dailyClosings: DailyClosing[] = [
   {
     closingId: 'closing-1',
+    comedorId: 'comedor-1',
     date: addDays(startOfThisWeek, 0),
-    plannedMenu: weeklyMenus.find(m => m.id === 'menu-1') || null,
+    plannedMenuId: 'menu-1',
     executedPax: 145,
     executedItems: [
       { name: 'Sopa de Lentejas', category: 'entrada' },

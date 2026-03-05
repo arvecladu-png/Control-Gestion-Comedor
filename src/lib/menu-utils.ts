@@ -29,9 +29,12 @@ export function calculateIngredientSummary(plan: WeeklyPlan, inventory: Inventor
         const inventoryItem = inventory.find(inv => inv.id === ingredient.inventoryItemId);
         if (!inventoryItem) return;
 
-        const wasteFactor = Math.max(0, Math.min(1, ingredient.wasteFactor || 0));
+        const rawWaste = ingredient.wasteFactor || 0;
+        const wasteFactor = rawWaste >= 1 ? rawWaste / 100 : rawWaste;
+        const safeWaste = Math.max(0, Math.min(0.99, wasteFactor));
+
         const netQuantityPerPax = ingredient.quantity;
-        const grossQuantityPerPax = wasteFactor === 1 ? netQuantityPerPax : netQuantityPerPax / (1 - wasteFactor)
+        const grossQuantityPerPax = netQuantityPerPax / (1 - safeWaste);
 
         const totalNetQuantity = netQuantityPerPax * menu.pax;
         const totalGrossQuantity = grossQuantityPerPax * menu.pax;
