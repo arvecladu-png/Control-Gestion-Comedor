@@ -33,28 +33,39 @@ export default function ScannerPage() {
   }, []);
 
 
-  const handleScan = async (data: { text: string } | null) => {
-    if (data && data.text) {
+  const handleScan = async (data: any) => {
+    if (data) {
+      // Handle both object { text: string } and direct string results
+      const scannedText = typeof data === 'object' && data.text ? data.text : (typeof data === 'string' ? data : null);
+
+      if (!scannedText) return;
+
       const now = Date.now();
       // Debounce: prevent re-scanning the same code within 3 seconds
-      if (lastResult && lastResult.userId === data.text && (now - lastResult.timestamp) < 3000) {
+      if (lastResult && lastResult.userId === scannedText && (now - lastResult.timestamp) < 3000) {
         return;
       }
 
-      setResult(data.text);
-      setLastResult({ userId: data.text, timestamp: now });
+      console.log("Scanned text:", scannedText);
+      setResult(scannedText);
+      setLastResult({ userId: scannedText, timestamp: now });
     }
   };
 
   const handleError = (err: any) => {
-    console.error(err);
-    if (hasCamera) {
-      setHasCamera(false);
-      toast({
-        variant: 'destructive',
-        title: 'Error de Cámara',
-        description: 'No se pudo acceder a la cámara. Revisa los permisos del navegador.',
-      });
+    // Some non-critical errors (like "Permission denied" being dismissed) shouldn't break the UI
+    console.error("QR Scanner Error:", err);
+
+    // Only set hasCamera to false if it's a persistent error
+    if (err && (err.name === 'NotAllowedError' || err.name === 'NotFoundError')) {
+      if (hasCamera) {
+        setHasCamera(false);
+        toast({
+          variant: 'destructive',
+          title: 'Error de Cámara',
+          description: 'No se pudo acceder a la cámara. Revisa los permisos del navegador o asegúrate de usar HTTPS.',
+        });
+      }
     }
   };
 
@@ -159,8 +170,8 @@ export default function ScannerPage() {
                   <li>Abre una nueva pestaña y ve a: <br /><code className="bg-black/50 px-1 text-green-400 select-all font-mono">chrome://flags</code></li>
                   <li>Busca: <span className="text-yellow-300 italic">unsafely-treat-insecure-origin-as-secure</span></li>
                   <li>Cambia a <span className="text-blue-400 font-bold">Enabled</span></li>
-                  <li>En el cuadro de texto escribe tu IP local (ej: <code className="text-green-400">http://192.168.1.10:3000</code>)</li>
-                  <li>Toca el botón <span className="text-blue-400 font-bold">Relaunch</span> abajo a la derecha.</li>
+                  <li>Escribe la URL del sistema: (ej: <code className="text-green-400">http://192.168.1.10:3000</code>)</li>
+                  <li>Toca <span className="text-blue-400 font-bold">Relaunch</span> y vuelve a esta página.</li>
                 </ol>
               </div>
             </div>
@@ -189,7 +200,12 @@ export default function ScannerPage() {
                   onScan={handleScan}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   constraints={{
-                    video: { facingMode: 'environment' }
+                    video: {
+                      facingMode: 'environment',
+                      width: { min: 640, ideal: 1280, max: 1920 },
+                      height: { min: 480, ideal: 720, max: 1080 },
+                      aspectRatio: 1
+                    }
                   }}
                 />
 

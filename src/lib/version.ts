@@ -1,6 +1,8 @@
-export const APP_VERSION = '1.3.7';
-export const RELEASE_DATE = '2026-02-28';
+export const APP_VERSION = '1.3.8';
+export const RELEASE_DATE = '2026-03-16';
 export const VERSION_NOTES = [
+    'Corrección Lector QR: Compatibilidad mejorada con navegadores móviles (Media Error fix)',
+    'Ajustes de cámara: Configuración adaptativa para diversos dispositivos',
     'Módulo de Cierre Diario Manual completo',
     'Selección dinámica de menú y fecha para cierres',
     'Reporte comparativo con cálculo de desviaciones',
